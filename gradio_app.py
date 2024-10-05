@@ -1,6 +1,7 @@
 import gradio as gr
-import pandas as pd
 from theme_classifier import ThemeClassifier
+from character_network import NamedEntityRecognizer, CharacterNetworkGenerator
+
 
 # Define the function to get themes
 def get_themes(theme_list_str, subtitles_path, save_path):
@@ -35,9 +36,21 @@ def get_themes(theme_list_str, subtitles_path, save_path):
 
         return output_chart
 
+def get_character_network(subtitles_path, ner_path):
+    ner = NamedEntityRecognizer()
+    ner_df = ner.get_ners(subtitles_path, ner_path)
+
+    character_network_generator = CharacterNetworkGenerator()
+    relationship_df = character_network_generator.generate_character_network(ner_df)
+    html = character_network_generator.draw_network_graph(relationship_df)
+
+    return html
+
+
 # Main Gradio interface function
 def main():
     with gr.Blocks() as iface:
+        #Theme Classification Section
         with gr.Row():
             with gr.Column():
                 gr.HTML("<h1>Theme Classification (Zero shot classifier)</h1>")
@@ -55,7 +68,18 @@ def main():
                             inputs=[theme_list, subtitles_path, save_path],
                             outputs=[plot]
                         )
-                            
+        #Character Network Section
+        with gr.Row():
+            with gr.Column():
+                gr.HTML("<h1>Character Network (NERs and Graphs)</h1>")
+                with gr.Row():
+                    with gr.Column():
+                        network_html = gr.HTML()
+                    with gr.Column():
+                        subtitles_path = gr.Textbox(label="Subtitles or script path")
+                        ner_path = gr.Textbox(label="NERs save path")
+                        get_network_graph_button = gr.Button("Get character network")
+                        get_network_graph_button.click(fn=get_character_network, inputs=[subtitles_path, ner_path],outputs=[network_html])                    
     iface.launch(share=True)
 
 
