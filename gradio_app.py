@@ -56,7 +56,7 @@ def main():
                             outputs=[plot]
                         )
                             
-    iface.launch(share=False)
+    iface.launch(share=True)
 
 
 # Run the app
