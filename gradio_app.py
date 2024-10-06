@@ -1,6 +1,10 @@
 import gradio as gr
 from theme_classifier import ThemeClassifier
 from character_network import NamedEntityRecognizer, CharacterNetworkGenerator
+from text_classification import JutsuClassifier
+from dotenv import load_dotenv
+import os
+load_dotenv()
 
 
 # Define the function to get themes
@@ -46,6 +50,14 @@ def get_character_network(subtitles_path, ner_path):
 
     return html
 
+def classify_text(text_classification_model_path, text_classification_data_path, text_to_classify):
+    jutsu_classifier = JutsuClassifier(model_path = text_classification_model_path,
+                                       data_path = text_classification_data_path,
+                                       huggingface_token = os.getenv("huggingface_token")
+                                       )
+    output = jutsu_classifier.classify_jutsu(text_to_classify)
+
+    return output
 
 # Main Gradio interface function
 def main():
@@ -79,7 +91,23 @@ def main():
                         subtitles_path = gr.Textbox(label="Subtitles or script path")
                         ner_path = gr.Textbox(label="NERs save path")
                         get_network_graph_button = gr.Button("Get character network")
-                        get_network_graph_button.click(fn=get_character_network, inputs=[subtitles_path, ner_path],outputs=[network_html])                    
+                        get_network_graph_button.click(fn=get_character_network, inputs=[subtitles_path, ner_path],outputs=[network_html]) 
+
+        #Text Classification with llms
+                with gr.Row():
+                    with gr.Column():
+                        gr.HTML("<h1>Text classifications with LLMs</h1>")
+                        with gr.Row():
+                            with gr.Column():
+                                text_classification_output = gr.Textbox(label="Text Classification output")
+                            with gr.Column():
+                                text_classification_model_path = gr.Textbox(label="Model path")
+                                text_classification_data_path = gr.Textbox(label="Data path")
+                                text_to_classify = gr.Textbox(label="Text input")
+                                classify_text_button = gr.Button("Classify text (Jutsu)")
+                                classify_text_button.click(fn=classify_text, inputs=[text_classification_model_path, text_classification_data_path, text_to_classify],outputs=[text_classification_output])  
+
+
     iface.launch(share=True)
 
 
