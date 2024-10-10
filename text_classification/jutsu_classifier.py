@@ -3,7 +3,7 @@ import pandas as pd
 import huggingface_hub
 from sklearn import preprocessing
 from sklearn.model_selection import train_test_split
-from transformers import AutoTokenizer,AutoModelForSequenceClassification, DataCollatorWithPadding, TrainingArguments, Pipeline
+from transformers import AutoTokenizer,AutoModelForSequenceClassification, DataCollatorWithPadding, TrainingArguments, pipeline
 from datasets import Dataset
 from .cleaner import Cleaner
 from .training_utils import get_class_weights, compute_metrics
@@ -54,7 +54,7 @@ class JutsuClassifier():
         self.model = self.load_model(self.model_path)
 
     def load_model(self, model_path):
-        model = Pipeline("text-classification", model=model_path, return_all_scores=True)
+        model = pipeline("text-classification", model=model_path, return_all_scores=True)
         return model
 
     def train_model(self, train_data, test_data, class_weights):
