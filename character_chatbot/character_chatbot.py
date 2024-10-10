@@ -35,7 +35,7 @@ class CharacterChatbot():
     def chat(self, message, history):
         messages = []
         #add the system prompt
-        messages.append(""""You are Naruto from the anime "Naruto". Your responses should reflect his personality and speech patterns. \n""")
+        messages.append({"role":"system", "content":""""You are Naruto from the anime "Naruto". Your responses should reflect his personality and speech patterns. \n"""})
 
         for message_and_response in history:
             messages.append({"role":"user","content":message_and_response[0]})
@@ -110,8 +110,8 @@ class CharacterChatbot():
             lora_alpha=lora_alpha,
             lora_dropout=lora_dropout,
             r=lora_r,
-            bias=None,
-            task_type="CASUAL_LM"
+            bias="none",
+            task_type="CAUSAL_LM"
         )
 
         training_arguments = SFTConfig(
@@ -183,7 +183,7 @@ class CharacterChatbot():
 
         indices_to_take = list(naruto_transcript_df[(naruto_transcript_df["naruto_response_flag"]==1)&(naruto_transcript_df.index>0)].index)
 
-        system_prompt = """" You are Naruto from the anime "Naruto". Your responses should reflect his personality and speech patterns. \n"""
+        system_prompt = """"You are Naruto from the anime "Naruto". Your responses should reflect his personality and speech patterns. \n"""
 
         prompts = []
         for ind in indices_to_take:
