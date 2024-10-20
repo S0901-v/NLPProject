@@ -129,7 +129,7 @@ def main():
                 
                 chat_button.click(fn=chat_with_character_chatbot,
                                   inputs=[message, history, character_select],  # Include character in inputs
-                                  outputs=[character_chat, history])
+                                  outputs=[character_chat])
 
     iface.launch(share=True)
 
