@@ -32,10 +32,10 @@ class CharacterChatbot():
             self.train(self.base_model_path, train_dataset)
             self.model = self.load_model(self.model_path)
             
-    def chat(self, message, history):
+    def chat(self, message, history, character):
         messages = []
         #add the system prompt
-        messages.append({"role":"system", "content":""""You are Naruto from the anime "Naruto". Your responses should reflect his personality and speech patterns. \n"""})
+        messages.append({"role":"system", "content":"You are "+str(character)+""" from the anime "Naruto". Your responses should reflect his personality and speech patterns. \n"""})
 
         for message_and_response in history:
             messages.append({"role":"user","content":message_and_response[0]})
@@ -48,7 +48,7 @@ class CharacterChatbot():
             self.model.tokenizer.convert_tokens_to_ids("<|eot_id|>")
         ]
         output = self.model(messages,
-                            max_length=256,
+                            max_length=512,
                             eos_token_id = terminator,
                             do_sample=True,
                             temperature = 0.6,

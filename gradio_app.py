@@ -7,7 +7,6 @@ from dotenv import load_dotenv
 import os
 load_dotenv()
 
-
 # Define the function to get themes
 def get_themes(theme_list_str, subtitles_path, save_path):
         theme_list = [theme.strip() for theme in theme_list_str.split(",")]
@@ -60,11 +59,12 @@ def classify_text(text_classification_model_path, text_classification_data_path,
     output = output[0]
     return output
 
-def chat_with_character_chatbot(message, history):
+
+def chat_with_character_chatbot(message, history, character):
     character_chatbot = CharacterChatbot("S1521/LlamaNaruto",
                                          huggingface_token=os.getenv("huggingface_token")
                                          )
-    output = character_chatbot.chat(message, history)
+    output = character_chatbot.chat(message, history, character)
     output = output["content"].strip()
     return output
 
@@ -119,7 +119,17 @@ def main():
         with gr.Row():
             with gr.Column():
                 gr.HTML("<h1>Character chatbot</h1>")
-                gr.ChatInterface(chat_with_character_chatbot)
+                character_select = gr.Textbox(label="Choose character")
+                character_chat = gr.Chatbot(label="Chat with character")
+                message = gr.Textbox(label="Your message")
+                history = gr.State([])  # To maintain chat history
+
+                # Button to set the character and chat
+                chat_button = gr.Button("Send message")
+                
+                chat_button.click(fn=chat_with_character_chatbot,
+                                  inputs=[message, history, character_select],  # Include character in inputs
+                                  outputs=[character_chat, history])
 
     iface.launch(share=True)
 
